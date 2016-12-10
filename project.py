@@ -34,7 +34,7 @@ session = DBSession()
 def showAllItems():
     categories = session.query(Category).order_by(asc(Category.id))
     items = session.query(Item).order_by(asc(Item.id))
-    return "hello"
+    return render_template('all_items.html', categories=categories, items=items)
 
 
 @app.route('/catalog/<path:category_name>/items/')

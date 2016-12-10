@@ -1,0 +1,60 @@
+{% extends "main.html" %}
+{% block content %}
+
+
+
+    <div class = 'flash'>
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+
+            <ul>
+            {% for message in messages %}
+                <li> <strong> {{ message }} </strong> </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+	<div class="row">
+		<div class="col-md-4">
+            <span id="what" class="title">Categories</span>
+        </div>
+		<div class="col-md-8">
+			<span class="title">Latest Items</span>
+            <a type="button" class="btn btn-default btn-add-item" href="#">Add Item
+			</a>
+		</div>
+	</div>
+
+
+
+    <div class="row">
+
+        <div class="col-md-4">
+            {% for c in categories %}
+                <a href = "#">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <h3>{{c.name}}</h3>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+
+        <div class="col-md-8">
+            {% for item in items %}
+                <a href = "#">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <h3>{{item.name}} ({{item.category.name}})</h3>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+
+    </div>
+
+{% endblock %}
