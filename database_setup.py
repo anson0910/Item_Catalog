@@ -50,8 +50,7 @@ class Item(Base):
             'name': self.name,
             'description': self.description,
             'id': self.id,
-            'price': self.price,
-            'course': self.course,
+            'category_id': self.category_id,
         }
 
 
