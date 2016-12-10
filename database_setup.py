@@ -15,7 +15,7 @@ class User(Base):
     picture = Column(String(250))
 
 
-class 3(Base):
+class Category(Base):
     __tablename__ = 'category'
 
     id = Column(Integer, primary_key=True)
