@@ -39,11 +39,10 @@ def showAllItems():
 
 @app.route('/catalog/<path:category_name>/items/')
 def showCategoryItems(category_name):
+    categories = session.query(Category).order_by(asc(Category.id))
     category = session.query(Category).filter_by(name=category_name).one()
     items = session.query(Item).filter_by(category=category).order_by(asc(Item.id))
-    for i in items:
-        print i.name
-    return "hello"
+    return render_template('items_category.html', categories=categories, category=category, items=items)
 
 
 @app.route('/catalog/<path:category_name>/<path:item_name>/')
