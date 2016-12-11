@@ -38,6 +38,7 @@ def showAllItems():
 
 @app.route('/catalog/<path:category_name>/items/')
 def showCategoryItems(category_name):
+    """Show items of specific category"""
     categories = session.query(Category).order_by(asc(Category.id))
     category = session.query(Category).filter_by(name=category_name).one()
     items = session.query(Item).filter_by(category=category).order_by(asc(Item.id))
@@ -46,12 +47,14 @@ def showCategoryItems(category_name):
 
 @app.route('/catalog/<path:category_name>/<path:item_name>/')
 def showItem(category_name, item_name):
+    """Show specific item with its description"""
     item = session.query(Item).filter_by(name=item_name).one()
     return render_template('item.html', item=item)
 
 
 @app.route('/new/', methods=['GET', 'POST'])
 def newItem():
+    """Create new item"""
     if 'username' not in login_session:
         return redirect('/login')
 
@@ -65,6 +68,34 @@ def newItem():
     else:
         categories = session.query(Category).order_by(asc(Category.id))
         return render_template('new_item.html', categories=categories)
+
+
+@app.route('/catalog/<path:category_name>/<path:item_name>/edit/', methods=['GET', 'POST'])
+def editItem(category_name, item_name):
+    """Edit item"""
+    if 'username' not in login_session:
+        return redirect('/login')
+
+    edited_item = session.query(Item).filter_by(name=item_name).one()
+    # verify user is owner of item
+    if login_session['user_id'] != edited_item.user_id:
+        return render_template('prohibit.html')
+
+    if request.method == 'POST':
+        if request.form['name']:
+            edited_item.name = request.form['name']
+        if request.form['description']:
+            edited_item.description = request.form['description']
+        if request.form['category_id']:
+            edited_item.category_id = request.form['category_id']
+
+        session.add(edited_item)
+        session.commit()
+        flash('Item %s Successfully Edited' % (edited_item.name))
+        return redirect(url_for('showAllItems'))
+    else:
+        categories = session.query(Category).order_by(asc(Category.id))
+        return render_template('edit_item.html', categories=categories, item=edited_item)
 
 
 # Create anti-forgery state token
