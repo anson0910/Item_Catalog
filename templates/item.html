@@ -1,0 +1,36 @@
+{% extends "main.html" %}
+{% block content %}
+
+
+    <div class = 'flash'>
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+
+            <ul>
+            {% for message in messages %}
+                <li> <strong> {{ message }} </strong> </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+	<div class="row">
+		<div class="col-xs-push-2 col-xs-10">
+            <span id="what" class="title">{{item.name}}</span>
+            <hr>
+        </div>
+	</div>
+
+
+
+    <div class="row">
+
+        <div class="col-xs-push-2 col-xs-10">
+            <h4>Description:</h4>
+            <p>{{item.description}}</p>
+        </div>
+
+    </div>
+
+{% endblock %}

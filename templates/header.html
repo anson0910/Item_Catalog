@@ -5,9 +5,9 @@
 	</div>
 	<div class="col-md-6 text-right login-btn">
 		{%if 'username' not in session %}
-		<a type="button" class="btn btn-primary" href="{{url_for('user_api.showLogin')}}">Login </a>
+		<a type="button" class="btn btn-primary" href="{{url_for('showLogin')}}">Login </a>
 		{% else %}
-		<a href="{{url_for('user_api.disconnect')}}">Logout </a>
+		<a href="{{url_for('disconnect')}}">Logout </a>
 		{% endif %}
 	</div>
         </div>

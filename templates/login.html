@@ -21,7 +21,7 @@
           <div id="signInButton">
           <span class="g-signin"
             data-scope="openid email"
-            data-clientid="13140951618-15nik769cellkubaqnjk5facdib2dh4d.apps.googleusercontent.com"
+            data-clientid="920589325372-u5lkgboh2bkmh0t7upsgqj837ruj7ilc.apps.googleusercontent.com"
             data-redirecturi="postmessage"
             data-accesstype="offline"
             data-cookiepolicy="single_host_origin"
@@ -51,8 +51,8 @@ function signInCallback(authResult) {
         if (result) {
           $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
          setTimeout(function() {
-          window.location.href = "/restaurant";
-         }, 4000);
+          window.location.href = "/";
+         }, 2000);
           
 
       } else if (authResult['error']) {
@@ -75,7 +75,7 @@ function signInCallback(authResult) {
 <script>
   window.fbAsyncInit = function() {
   FB.init({
-    appId      : '846524132078825',
+    appId      : '1814069005477941',
     cookie     : true,  // enable cookies to allow the server to access 
                         // the session
     xfbml      : true,  // parse social plugins on this page
@@ -112,8 +112,8 @@ function signInCallback(authResult) {
         if (result) {
           $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
          setTimeout(function() {
-          window.location.href = "/restaurant";
-         }, 4000);
+          window.location.href = "/";
+         }, 2000);
           
 
       } else {
