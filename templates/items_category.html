@@ -22,8 +22,9 @@
         </div>
 		<div class="col-md-8">
 			<span class="title">{{category.name}} Items</span>
-            <a type="button" class="btn btn-default btn-add-item" href="#">Add Item
-			</a>
+            {%if 'username' in session %}
+                <a type="button" class="btn btn-default btn-add-item" href="{{url_for('newItem')}}">Add Item</a>
+		    {% endif %}
 		</div>
 	</div>
 

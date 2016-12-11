@@ -47,8 +47,24 @@ def showCategoryItems(category_name):
 @app.route('/catalog/<path:category_name>/<path:item_name>/')
 def showItem(category_name, item_name):
     item = session.query(Item).filter_by(name=item_name).one()
-    print item.name
     return render_template('item.html', item=item)
+
+
+@app.route('/new/', methods=['GET', 'POST'])
+def newItem():
+    if 'username' not in login_session:
+        return redirect('/login')
+
+    if request.method == 'POST':
+        new_item = Item(name=request.form['name'], description=request.form['description'],
+                        category_id=request.form['category_id'], user_id=login_session['user_id'])
+        session.add(new_item)
+        session.commit()
+        flash('New Item %s Successfully Created' % (new_item.name))
+        return redirect(url_for('showAllItems'))
+    else:
+        categories = session.query(Category).order_by(asc(Category.id))
+        return render_template('new_item.html', categories=categories)
 
 
 # Create anti-forgery state token
@@ -261,7 +277,8 @@ def disconnect():
         if login_session['provider'] == 'google':
             gdisconnect()
             del login_session['gplus_id']
-            del login_session['credentials']
+            if 'credentials' in login_session:
+                del login_session['credentials']
         if login_session['provider'] == 'facebook':
             fbdisconnect()
             del login_session['facebook_id']
