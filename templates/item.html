@@ -31,7 +31,7 @@
             <p>{{item.description}}</p>
             {%if 'username' in session %}
                 <a type="button" class="btn btn-default " href="{{url_for('editItem', category_name=item.category.name, item_name=item.name)}}">Edit</a>
-                <a type="button" class="btn btn-default " href="{{url_for('deleteItem', category_name=item.category.name, item_name=item.name)}}">Delete</a>
+                <a type="button" class="btn btn-danger  " href="{{url_for('deleteItem', category_name=item.category.name, item_name=item.name)}}">Delete</a>
 		    {% endif %}
         </div>
 
