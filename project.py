@@ -118,6 +118,20 @@ def deleteItem(category_name, item_name):
         return render_template('delete_item.html', item=item_to_delete)
 
 
+# JSON API to view Catalog Information
+@app.route('/catalog.json')
+def catalogJSON():
+    categories = session.query(Category).order_by(asc(Category.id))
+    return jsonify(Categories=[c.serialize for c in categories])
+
+
+# JSON API to view Item Information
+@app.route('/item.json')
+def itemJSON():
+    items = session.query(Item).order_by(asc(Item.id))
+    return jsonify(Items=[i.serialize for i in items])
+
+
 # Create anti-forgery state token
 @app.route('/login')
 def showLogin():
@@ -373,26 +387,3 @@ if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
     app.run(host='0.0.0.0', port=5000)
-
-
-
-
-# # JSON APIs to view Restaurant Information
-# @app.route('/restaurant/<int:restaurant_id>/menu/JSON')
-# def restaurantMenuJSON(restaurant_id):
-#     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-#     items = session.query(MenuItem).filter_by(
-#         restaurant_id=restaurant_id).all()
-#     return jsonify(MenuItems=[i.serialize for i in items])
-#
-#
-# @app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/JSON')
-# def menuItemJSON(restaurant_id, menu_id):
-#     Menu_Item = session.query(MenuItem).filter_by(id=menu_id).one()
-#     return jsonify(Menu_Item=Menu_Item.serialize)
-#
-#
-# @app.route('/restaurant/JSON')
-# def restaurantsJSON():
-#     restaurants = session.query(Restaurant).all()
-#     return jsonify(restaurants=[r.serialize for r in restaurants])
