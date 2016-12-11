@@ -98,6 +98,26 @@ def editItem(category_name, item_name):
         return render_template('edit_item.html', categories=categories, item=edited_item)
 
 
+@app.route('/catalog/<path:category_name>/<path:item_name>/delete/', methods=['GET', 'POST'])
+def deleteItem(category_name, item_name):
+    """Edit item"""
+    if 'username' not in login_session:
+        return redirect('/login')
+
+    item_to_delete = session.query(Item).filter_by(name=item_name).one()
+    # verify user is owner of item
+    if login_session['user_id'] != item_to_delete.user_id:
+        return render_template('prohibit.html')
+
+    if request.method == 'POST':
+        session.delete(item_to_delete)
+        session.commit()
+        flash('Item %s Successfully Deleted' % (item_to_delete.name))
+        return redirect(url_for('showAllItems'))
+    else:
+        return render_template('delete_item.html', item=item_to_delete)
+
+
 # Create anti-forgery state token
 @app.route('/login')
 def showLogin():
