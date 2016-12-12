@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request, \
+    redirect, jsonify, url_for, flash
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Item
@@ -33,7 +34,8 @@ session = DBSession()
 def showAllItems():
     categories = session.query(Category).order_by(asc(Category.id))
     items = session.query(Item).order_by(asc(Item.id))
-    return render_template('items_all.html', categories=categories, items=items)
+    return render_template('items_all.html',
+                           categories=categories, items=items)
 
 
 @app.route('/catalog/<path:category_name>/items/')
@@ -41,8 +43,10 @@ def showCategoryItems(category_name):
     """Show items of specific category"""
     categories = session.query(Category).order_by(asc(Category.id))
     category = session.query(Category).filter_by(name=category_name).one()
-    items = session.query(Item).filter_by(category=category).order_by(asc(Item.id))
-    return render_template('items_category.html', categories=categories, category=category, items=items)
+    items = session.query(Item).\
+        filter_by(category=category).order_by(asc(Item.id))
+    return render_template('items_category.html', categories=categories,
+                           category=category, items=items)
 
 
 @app.route('/catalog/<path:category_name>/<path:item_name>/')
@@ -59,8 +63,10 @@ def newItem():
         return redirect('/login')
 
     if request.method == 'POST':
-        new_item = Item(name=request.form['name'], description=request.form['description'],
-                        category_id=request.form['category_id'], user_id=login_session['user_id'])
+        new_item = Item(name=request.form['name'],
+                        description=request.form['description'],
+                        category_id=request.form['category_id'],
+                        user_id=login_session['user_id'])
         session.add(new_item)
         session.commit()
         flash('New Item %s Successfully Created' % (new_item.name))
@@ -70,7 +76,8 @@ def newItem():
         return render_template('new_item.html', categories=categories)
 
 
-@app.route('/catalog/<path:category_name>/<path:item_name>/edit/', methods=['GET', 'POST'])
+@app.route('/catalog/<path:category_name>/<path:item_name>/edit/',
+           methods=['GET', 'POST'])
 def editItem(category_name, item_name):
     """Edit item"""
     if 'username' not in login_session:
@@ -95,10 +102,12 @@ def editItem(category_name, item_name):
         return redirect(url_for('showAllItems'))
     else:
         categories = session.query(Category).order_by(asc(Category.id))
-        return render_template('edit_item.html', categories=categories, item=edited_item)
+        return render_template('edit_item.html',
+                               categories=categories, item=edited_item)
 
 
-@app.route('/catalog/<path:category_name>/<path:item_name>/delete/', methods=['GET', 'POST'])
+@app.route('/catalog/<path:category_name>/<path:item_name>/delete/',
+           methods=['GET', 'POST'])
 def deleteItem(category_name, item_name):
     """Edit item"""
     if 'username' not in login_session:
@@ -126,10 +135,17 @@ def catalogJSON():
 
 
 # JSON API to view Item Information
-@app.route('/item.json')
-def itemJSON():
+@app.route('/items.json')
+def itemsJSON():
     items = session.query(Item).order_by(asc(Item.id))
     return jsonify(Items=[i.serialize for i in items])
+
+
+@app.route('/catalog/<path:category_name>/<path:item_name>.json')
+def itemJSON(category_name, item_name):
+    """Show specific item with its description"""
+    item = session.query(Item).filter_by(name=item_name).one()
+    return jsonify(Item=item.serialize)
 
 
 # Create anti-forgery state token
@@ -155,8 +171,10 @@ def fbconnect():
         'web']['app_id']
     app_secret = json.loads(
         open('fb_client_secrets.json', 'r').read())['web']['app_secret']
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
-        app_id, app_secret, access_token)
+    url = 'https://graph.facebook.com/oauth/access_token?' \
+          'grant_type=fb_exchange_token&client_id=%s&' \
+          'client_secret=%s&fb_exchange_token=%s' \
+          % (app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
 
@@ -164,7 +182,6 @@ def fbconnect():
     userinfo_url = "https://graph.facebook.com/v2.4/me"
     # strip expire tag from access token
     token = result.split("&")[0]
-
 
     url = 'https://graph.facebook.com/v2.4/me?%s&fields=name,id,email' % token
     h = httplib2.Http()
@@ -177,12 +194,15 @@ def fbconnect():
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
 
-    # The token must be stored in the login_session in order to properly logout, let's strip out the information before the equals sign in our token
+    # The token must be stored in the login_session
+    # in order to properly logout, let's strip out the information
+    # before the equals sign in our token
     stored_token = token.split("=")[1]
     login_session['access_token'] = stored_token
 
     # Get user picture
-    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200' % token
+    url = 'https://graph.facebook.com/v2.4/me/picture?' \
+          '%s&redirect=0&height=200&width=200' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -202,7 +222,8 @@ def fbconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;' \
+              '-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
 
     flash("Now logged in as %s" % login_session['username'])
     return output
@@ -213,7 +234,8 @@ def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must me included to successfully logout
     access_token = login_session['access_token']
-    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' \
+          % (facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
     return "you have been logged out"
@@ -271,8 +293,8 @@ def gconnect():
     stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_credentials is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(
+            json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -305,7 +327,9 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;' \
+              'border-radius: 150px;-webkit-border-radius: ' \
+              '150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -324,7 +348,8 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     access_token = credentials.access_token
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' \
+          % access_token
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     if result['status'] != '200':
