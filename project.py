@@ -12,6 +12,7 @@ import random
 import string
 from flask import make_response
 import requests
+from functools import wraps
 
 
 app = Flask(__name__)
@@ -56,12 +57,21 @@ def showItem(category_name, item_name):
     return render_template('item.html', item=item)
 
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'email' in login_session:
+            return f(*args, **kwargs)
+        else:
+            flash('You are not allowed to access there')
+            return redirect('/login')
+    return decorated_function
+
+
 @app.route('/new/', methods=['GET', 'POST'])
+@login_required
 def newItem():
     """Create new item"""
-    if 'username' not in login_session:
-        return redirect('/login')
-
     if request.method == 'POST':
         new_item = Item(name=request.form['name'],
                         description=request.form['description'],
@@ -78,11 +88,9 @@ def newItem():
 
 @app.route('/catalog/<path:category_name>/<path:item_name>/edit/',
            methods=['GET', 'POST'])
+@login_required
 def editItem(category_name, item_name):
     """Edit item"""
-    if 'username' not in login_session:
-        return redirect('/login')
-
     edited_item = session.query(Item).filter_by(name=item_name).one()
     # verify user is owner of item
     if login_session['user_id'] != edited_item.user_id:
@@ -108,11 +116,9 @@ def editItem(category_name, item_name):
 
 @app.route('/catalog/<path:category_name>/<path:item_name>/delete/',
            methods=['GET', 'POST'])
+@login_required
 def deleteItem(category_name, item_name):
     """Edit item"""
-    if 'username' not in login_session:
-        return redirect('/login')
-
     item_to_delete = session.query(Item).filter_by(name=item_name).one()
     # verify user is owner of item
     if login_session['user_id'] != item_to_delete.user_id:
